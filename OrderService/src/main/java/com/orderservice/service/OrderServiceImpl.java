@@ -1,6 +1,7 @@
 package com.orderservice.service;
 
 import com.orderservice.entity.Order;
+import com.orderservice.external.client.ProductService;
 import com.orderservice.model.OrderRequest;
 import com.orderservice.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
@@ -16,12 +17,19 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductService productService;
 
     public long placeOrder(OrderRequest orderRequest) {
 
+        //steps we will follow
         //1.save order
         //2. reduce quantity by reduceAPi from productService
         //3.payment service call
+
+        //reduce quantity first from ProductService API call
+        productService.reduceQuantity(orderRequest.getProductId(), orderRequest.getQuantity());
+
 
         log.info("Creating Order with Status CREATED");
         Order order = Order.builder()
