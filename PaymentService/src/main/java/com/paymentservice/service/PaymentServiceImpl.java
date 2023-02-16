@@ -1,7 +1,9 @@
 package com.paymentservice.service;
 
 import com.paymentservice.entity.TransactionDetails;
+import com.paymentservice.model.PaymentMode;
 import com.paymentservice.model.PaymentRequest;
+import com.paymentservice.model.PaymentResponse;
 import com.paymentservice.repository.TransactionDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,5 +38,28 @@ public class PaymentServiceImpl implements PaymentService{
         log.info("Transaction Completed with Id: {}", transactionDetails.getId());
 
         return transactionDetails.getId();
+    }
+
+    @Override
+    public PaymentResponse getPaymentDetailsByOrderId(String orderId) {
+
+        log.info("getting payment details for orderId" + orderId);
+
+        TransactionDetails transactionDetails = transactionDetailsRepository.findByOrderId(Long.valueOf(orderId));
+        PaymentResponse paymentResponse = null;
+        if(transactionDetails!=null){
+             paymentResponse = PaymentResponse.builder()
+                    .paymentId(transactionDetails.getId())
+                    .paymentDate(transactionDetails.getPaymentDate())
+                    .paymentMode(PaymentMode.valueOf(transactionDetails.getPaymentMode()))
+                    .orderId(transactionDetails.getOrderId())
+                    .amount(transactionDetails.getAmount())
+                    .status(transactionDetails.getPaymentStatus())
+                    .build();
+
+        }
+
+        return paymentResponse;
+
     }
 }
